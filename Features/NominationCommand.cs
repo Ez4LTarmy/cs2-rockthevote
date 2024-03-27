@@ -1,10 +1,9 @@
-﻿
+
 using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Core.Attributes.Registration;
 using CounterStrikeSharp.API.Modules.Commands;
 using CounterStrikeSharp.API.Modules.Menu;
-using cs2_rockthevote.Core;
 
 namespace cs2_rockthevote
 {
@@ -34,17 +33,15 @@ namespace cs2_rockthevote
         private GameRules _gamerules;
         private StringLocalizer _localizer;
         private PluginState _pluginState;
-        private MapCooldown _mapCooldown;
         private MapLister _mapLister;
 
-        public NominationCommand(MapLister mapLister, GameRules gamerules, StringLocalizer localizer, PluginState pluginState, MapCooldown mapCooldown)
+        public NominationCommand(MapLister mapLister, GameRules gamerules, StringLocalizer localizer, PluginState pluginState)
         {
             _mapLister = mapLister;
+            _mapLister.EventMapsLoaded += OnMapsLoaded;
             _gamerules = gamerules;
             _localizer = localizer;
             _pluginState = pluginState;
-            _mapCooldown = mapCooldown;
-            _mapCooldown.EventCooldownRefreshed += OnMapsLoaded;
         }
 
 
@@ -58,6 +55,7 @@ namespace cs2_rockthevote
             _config = config.Rtv;
         }
 
+
         public void OnMapsLoaded(object? sender, Map[] maps)
         {
             nominationMenu = new("Nomination");
@@ -66,15 +64,12 @@ namespace cs2_rockthevote
                 nominationMenu.AddMenuOption(map.Name, (CCSPlayerController player, ChatMenuOption option) =>
                 {
                     Nominate(player, option.Text);
-                }, _mapCooldown.IsMapInCooldown(map.Name));
+                });
             }
         }
 
-        public void CommandHandler(CCSPlayerController? player, string map)
+        public void CommandHandler(CCSPlayerController player, string map)
         {
-            if (player is null)
-                return;
-
             map = map.ToLower().Trim();
             if (_pluginState.DisableCommands || !_config.NominationEnabled)
             {
@@ -82,23 +77,21 @@ namespace cs2_rockthevote
                 return;
             }
 
-            if (_gamerules.WarmupRunning)
+            if (!_config.EnabledInWarmup && _gamerules.WarmupRunning)
             {
-                if (!_config.EnabledInWarmup)
-                {
-                    player.PrintToChat(_localizer.LocalizeWithPrefix("general.validation.warmup"));
-                    return;
-                }
-            }
-            else if (_config.MinRounds > 0 && _config.MinRounds > _gamerules.TotalRoundsPlayed)
-            {
-                player!.PrintToChat(_localizer.LocalizeWithPrefix("general.validation.minimum-rounds", _config.MinRounds));
+                player.PrintToChat(_localizer.LocalizeWithPrefix("general.validation.warmup"));
                 return;
             }
 
             if (ServerManager.ValidPlayerCount() < _config!.MinPlayers)
             {
                 player.PrintToChat(_localizer.LocalizeWithPrefix("general.validation.minimum-players", _config!.MinPlayers));
+                return;
+            }
+
+            if (_config.MinRounds > 0 && _config.MinRounds > _gamerules.TotalRoundsPlayed)
+            {
+                player!.PrintToChat(_localizer.LocalizeWithPrefix("general.validation.minimum-rounds", _config.MinRounds));
                 return;
             }
 
@@ -125,34 +118,26 @@ namespace cs2_rockthevote
                 return;
             }
 
-            if (_mapCooldown.IsMapInCooldown(map))
-            {
-                player!.PrintToChat(_localizer.LocalizeWithPrefix("general.validation.map-played-recently"));
-                return;
-            }
+            string matchingMap = _mapLister.GetSingleMatchingMapName(map, player, _localizer);
 
-            if (_mapLister.Maps!.Select(x => x.Name).FirstOrDefault(x => x.ToLower() == map) is null)
-            {
-                player!.PrintToChat(_localizer.LocalizeWithPrefix("general.invalid-map"));
+            if (matchingMap == "")
                 return;
-
-            }
 
             var userId = player.UserId!.Value;
             if (!Nominations.ContainsKey(userId))
                 Nominations[userId] = new();
 
-            bool alreadyVoted = Nominations[userId].IndexOf(map) != -1;
+            bool alreadyVoted = Nominations[userId].IndexOf(matchingMap) != -1;
             if (!alreadyVoted)
-                Nominations[userId].Add(map);
+                Nominations[userId].Add(matchingMap);
 
-            var totalVotes = Nominations.Select(x => x.Value.Where(y => y == map).Count())
+            var totalVotes = Nominations.Select(x => x.Value.Where(y => y == matchingMap).Count())
                 .Sum();
 
             if (!alreadyVoted)
-                Server.PrintToChatAll(_localizer.LocalizeWithPrefix("nominate.nominated", player.PlayerName, map, totalVotes));
+                Server.PrintToChatAll(_localizer.LocalizeWithPrefix("nominate.nominated", player.PlayerName, matchingMap, totalVotes));
             else
-                player.PrintToChat(_localizer.LocalizeWithPrefix("nominate.already-nominated", map, totalVotes));
+                player.PrintToChat(_localizer.LocalizeWithPrefix("nominate.already-nominated", matchingMap, totalVotes));
         }
 
         public List<string> NominationWinners()
