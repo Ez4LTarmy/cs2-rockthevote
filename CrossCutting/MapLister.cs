@@ -127,7 +127,7 @@ namespace cs2_rockthevote
     }
 
     // Inside your plugin class or wherever you handle client commands
-    public class NominatedMap
+    public class YourPluginClass
     {
         private MapLister mapLister; // assuming you have an instance of MapLister
 
