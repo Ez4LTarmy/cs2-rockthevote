@@ -1,10 +1,6 @@
-using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Entities;
 using cs2_rockthevote.Core;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+using CounterStrikeSharp.API.Core;
 
 namespace cs2_rockthevote
 {
@@ -16,11 +12,10 @@ namespace cs2_rockthevote
         public event EventHandler<Map[]>? EventMapsLoaded;
 
         private Plugin? _plugin;
-        private MapCooldown? _mapCooldown;
 
-        public MapLister(MapCooldown mapCooldown)
+        public MapLister()
         {
-            _mapCooldown = mapCooldown;
+
         }
 
         public void Clear()
@@ -59,21 +54,21 @@ namespace cs2_rockthevote
                 LoadMaps();
         }
 
+
         public void OnLoad(Plugin plugin)
         {
             _plugin = plugin;
             LoadMaps();
         }
 
+        // returns "" if there's no matching or if there's more than one
+        // otherwise, returns the macting name
         public string GetSingleMatchingMapName(string map, CCSPlayerController player, StringLocalizer _localizer)
         {
-            if (this.Maps == null)
-            {
-                player!.PrintToChat(_localizer.LocalizeWithPrefix("general.map-list-not-loaded"));
-                return "";
-            }
+            if (this.Maps!.Select(x => x.Name).FirstOrDefault(x => x.ToLower() == map) is not null)
+                return map;
 
-            var matchingMaps = this.Maps
+            var matchingMaps = this.Maps!
                 .Select(x => x.Name)
                 .Where(x => x.ToLower().Contains(map.ToLower()))
                 .ToList();
@@ -88,16 +83,8 @@ namespace cs2_rockthevote
                 player!.PrintToChat(_localizer.LocalizeWithPrefix("nominate.multiple-maps-containing-name"));
                 return "";
             }
-
-            var nominatedMap = matchingMaps[0];
-
-            if (_mapCooldown != null && _mapCooldown.IsMapInCooldown(nominatedMap))
-            {
-                player!.PrintToChat(_localizer.LocalizeWithPrefix("map.cooldown"));
-                return "";
-            }
-
-            return nominatedMap;
+            
+            return matchingMaps[0];
         }
     }
 }
