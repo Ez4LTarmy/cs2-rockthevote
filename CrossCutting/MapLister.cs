@@ -1,9 +1,6 @@
-using System;
-using System.IO;
-using System.Linq;
-using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Entities;
 using cs2_rockthevote.Core;
+using CounterStrikeSharp.API.Core;
 
 namespace cs2_rockthevote
 {
@@ -16,9 +13,6 @@ namespace cs2_rockthevote
 
         private Plugin? _plugin;
 
-        // Store nominated maps
-        private List<Map> NominatedMaps { get; } = new List<Map>();
-
         public MapLister()
         {
 
@@ -28,7 +22,6 @@ namespace cs2_rockthevote
         {
             MapsLoaded = false;
             Maps = null;
-            NominatedMaps.Clear();
         }
 
         void LoadMaps()
@@ -61,6 +54,7 @@ namespace cs2_rockthevote
                 LoadMaps();
         }
 
+
         public void OnLoad(Plugin plugin)
         {
             _plugin = plugin;
@@ -68,52 +62,29 @@ namespace cs2_rockthevote
         }
 
         // returns "" if there's no matching or if there's more than one
-        // otherwise, returns the matching name
+        // otherwise, returns the macting name
         public string GetSingleMatchingMapName(string map, CCSPlayerController player, StringLocalizer _localizer)
         {
-            var matchingMaps = this.Maps
-                .Where(x => x.Name.ToLower().Contains(map.ToLower()))
+            if (this.Maps!.Select(x => x.Name).FirstOrDefault(x => x.ToLower() == map) is not null)
+                return map;
+
+            var matchingMaps = this.Maps!
+                .Select(x => x.Name)
+                .Where(x => x.ToLower().Contains(map.ToLower()))
                 .ToList();
 
             if (matchingMaps.Count == 0)
             {
-                player?.PrintToChat(_localizer.LocalizeWithPrefix("general.invalid-map"));
-                return ""; // Return empty string if no matching maps found
+                player!.PrintToChat(_localizer.LocalizeWithPrefix("general.invalid-map"));
+                return "";
             }
             else if (matchingMaps.Count > 1)
             {
-                player?.PrintToChat(_localizer.LocalizeWithPrefix("nominate.multiple-maps-containing-name"));
-                return ""; // Return empty string if multiple matching maps found
+                player!.PrintToChat(_localizer.LocalizeWithPrefix("nominate.multiple-maps-containing-name"));
+                return "";
             }
-
-            // Return the name of the single matching map
-            return matchingMaps[0].Name;
-        }
-
-        // Method to nominate a map
-        public void NominateMap(string mapName)
-        {
-            var map = Maps.FirstOrDefault(x => x.Name.ToLower() == mapName.ToLower());
-            if (map != null && !NominatedMaps.Contains(map))
-            {
-                NominatedMaps.Add(map);
-            }
-        }
-
-        // Method to print nominated maps to the client
-        public void PrintNominatedMapsToClient(CCSPlayerController player)
-        {
-            if (NominatedMaps.Count == 0)
-            {
-                player?.PrintToChat("No maps have been nominated yet.");
-                return;
-            }
-
-            player?.PrintToChat("Nominated Maps:");
-            for (int i = 0; i < Math.Min(NominatedMaps.Count, 6); i++)
-            {
-                player?.PrintToChat($"{i + 1}. {NominatedMaps[i].Name}");
-            }
+            
+            return matchingMaps[0];
         }
     }
 }
