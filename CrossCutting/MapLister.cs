@@ -15,14 +15,13 @@ namespace cs2_rockthevote
         public event EventHandler<Map[]>? EventMapsLoaded;
 
         private Plugin? _plugin;
-        private MapCooldown? _mapCooldown; // Reference to MapCooldown class
 
         // Store nominated maps
         private List<Map> NominatedMaps { get; } = new List<Map>();
 
-        public MapLister(MapCooldown mapCooldown)
+        public MapLister()
         {
-            _mapCooldown = mapCooldown;
+
         }
 
         public void Clear()
@@ -59,10 +58,7 @@ namespace cs2_rockthevote
         public void OnMapStart(string _map)
         {
             if (_plugin is not null)
-            {
                 LoadMaps();
-                _mapCooldown?.UpdateRecentlyPlayedMap(_map);
-            }
         }
 
         public void OnLoad(Plugin plugin)
@@ -75,14 +71,6 @@ namespace cs2_rockthevote
         // otherwise, returns the matching name
         public string GetSingleMatchingMapName(string map, CCSPlayerController player, StringLocalizer _localizer)
         {
-            // Check if the map is already on cooldown due to being recently played
-            if (_mapCooldown != null && _mapCooldown.IsMapInCooldown(map.ToLower()))
-            {
-                player?.PrintToChat(_localizer.LocalizeWithPrefix("nominate.map-on-cooldown", map, _mapCooldown.InCoolDown));
-                return ""; // Return empty string to indicate that the map cannot be nominated
-            }
-
-            // Check for maps containing the provided map name
             var matchingMaps = this.Maps
                 .Where(x => x.Name.ToLower().Contains(map.ToLower()))
                 .ToList();
