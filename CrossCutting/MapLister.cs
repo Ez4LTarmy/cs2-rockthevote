@@ -67,10 +67,13 @@ namespace cs2_rockthevote
 
         public string GetSingleMatchingMapName(string map, CCSPlayerController player, StringLocalizer _localizer)
         {
-            if (this.Maps!.Select(x => x.Name).FirstOrDefault(x => x.ToLower() == map) is not null)
-                return map;
+            if (this.Maps == null)
+            {
+                player!.PrintToChat(_localizer.LocalizeWithPrefix("general.map-list-not-loaded"));
+                return "";
+            }
 
-            var matchingMaps = this.Maps!
+            var matchingMaps = this.Maps
                 .Select(x => x.Name)
                 .Where(x => x.ToLower().Contains(map.ToLower()))
                 .ToList();
@@ -87,6 +90,7 @@ namespace cs2_rockthevote
             }
 
             var nominatedMap = matchingMaps[0];
+
             if (_mapCooldown != null && _mapCooldown.IsMapInCooldown(nominatedMap))
             {
                 player!.PrintToChat(_localizer.LocalizeWithPrefix("map.cooldown"));
