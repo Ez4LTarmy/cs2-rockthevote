@@ -16,6 +16,7 @@
   "votemap.changing-map-next-round": "The map will be changed to {green}{0}{default} in the next round...",
   "general.votes-needed": "({0} voted, {1} needed)",
   "general.invalid-map": "Invalid map",
+  "map.cooldown": "Map is on cooldown",
   "nominate.nominated": "Player {green}{0}{default} nominated map {green}{1}{default}, now it has {2} vote(s)",
   "nominate.already-nominated": "You already nominated the map {green}{0}{default}, it has {1} vote(s)",
   "nominate.multiple-maps-containing-name": "There's more than one map with the given name",
