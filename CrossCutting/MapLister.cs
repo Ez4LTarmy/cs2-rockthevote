@@ -1,10 +1,9 @@
-using CounterStrikeSharp.API.Modules.Entities;
-using cs2_rockthevote.Core;
-using CounterStrikeSharp.API.Core;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Collections.Generic;
+using CounterStrikeSharp.API.Modules.Entities;
+using CounterStrikeSharp.API.Core;
 
 namespace cs2_rockthevote
 {
@@ -74,16 +73,16 @@ namespace cs2_rockthevote
         {
             // Check if the map is already in the list and if it has a cooldown
             var existingMap = this.Maps.FirstOrDefault(x => x.Name.ToLower() == map.ToLower());
-            if (existingMap != null && existingMap.Cooldown > 0)
+            if (existingMap != null && existingMap.Id != null) // Assuming Id is used for cooldown
             {
-                player?.PrintToChat(_localizer.LocalizeWithPrefix("nominate.map-on-cooldown", existingMap.Name, existingMap.Cooldown));
+                player?.PrintToChat(_localizer.LocalizeWithPrefix("nominate.map-on-cooldown", existingMap.Name, existingMap.Id));
                 return ""; // Return empty string to indicate that the map cannot be nominated
             }
 
             // Check for maps containing the provided map name
             var matchingMaps = this.Maps
                 .Where(x => x.Name.ToLower().Contains(map.ToLower()))
-                .Where(x => x.Cooldown <= 0) // Exclude maps with cooldowns
+                .Where(x => x.Id == null) // Exclude maps with cooldowns
                 .ToList();
 
             if (matchingMaps.Count == 0)
@@ -122,20 +121,6 @@ namespace cs2_rockthevote
                     break;
                 player?.PrintToChat($"{count + 1}. {map.Name}");
                 count++;
-            }
-        }
-    }
-
-    // Inside your plugin class or wherever you handle client commands
-    public class YourPluginClass
-    {
-        private MapLister mapLister; // assuming you have an instance of MapLister
-
-        public void OnClientCommand(CCSPlayerController player, string command)
-        {
-            if (command.StartsWith("!mapnominated"))
-            {
-                mapLister.PrintNominatedMapsToClient(player);
             }
         }
     }
