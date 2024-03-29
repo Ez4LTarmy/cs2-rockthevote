@@ -1,9 +1,9 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using CounterStrikeSharp.API.Modules.Entities;
 using CounterStrikeSharp.API.Core;
+using CounterStrikeSharp.API.Modules.Entities;
+using System.Collections.Generic;
 
 namespace cs2_rockthevote
 {
@@ -113,14 +113,25 @@ namespace cs2_rockthevote
         // Method to print nominated maps to the client
         public void PrintNominatedMapsToClient(CCSPlayerController player)
         {
-            player?.PrintToChat("Nominated Maps:");
-            int count = 0;
-            foreach (var map in NominatedMaps)
+            if (NominatedMaps.Count == 0)
             {
-                if (count >= 6)
-                    break;
-                player?.PrintToChat($"{count + 1}. {map.Name}");
-                count++;
+                player?.PrintToChat("No maps have been nominated yet.");
+                return;
+            }
+
+            player?.PrintToChat("Nominated Maps:");
+            for (int i = 0; i < Math.Min(NominatedMaps.Count, 6); i++)
+            {
+                player?.PrintToChat($"{i + 1}. {NominatedMaps[i].Name}");
+            }
+        }
+
+        // Command handling for !mapnominated
+        public void HandleMapNominatedCommand(CCSPlayerController player, string command)
+        {
+            if (command.StartsWith("!mapnominated"))
+            {
+                PrintNominatedMapsToClient(player);
             }
         }
     }
