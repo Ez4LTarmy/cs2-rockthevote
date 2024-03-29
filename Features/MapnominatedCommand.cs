@@ -6,8 +6,8 @@ namespace cs2_rockthevote
 {
     public partial class Plugin
     {
-        [CounterStrikeSharp.API.Core.ConsoleCommand("mapnominated", "Display nominated maps")]
-        public void OnMapNominated(CCSPlayerController player, CommandInfo command)
+        [ConsoleCommand("mapnominated", "Display nominated maps")]
+        public void OnMapNominated(CCSPlayerController player, string[] args)
         {
             _mapLister.PrintNominatedMapsToClient(player);
         }
