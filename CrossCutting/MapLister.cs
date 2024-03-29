@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Entities;
-using System.Collections.Generic;
+using cs2_rockthevote.Core;
 
 namespace cs2_rockthevote
 {
@@ -15,13 +15,14 @@ namespace cs2_rockthevote
         public event EventHandler<Map[]>? EventMapsLoaded;
 
         private Plugin? _plugin;
+        private MapCooldown? _mapCooldown; // Reference to MapCooldown class
 
         // Store nominated maps
         private List<Map> NominatedMaps { get; } = new List<Map>();
 
-        public MapLister()
+        public MapLister(MapCooldown mapCooldown)
         {
-
+            _mapCooldown = mapCooldown;
         }
 
         public void Clear()
@@ -58,7 +59,10 @@ namespace cs2_rockthevote
         public void OnMapStart(string _map)
         {
             if (_plugin is not null)
+            {
                 LoadMaps();
+                _mapCooldown?.UpdateRecentlyPlayedMap(_map);
+            }
         }
 
         public void OnLoad(Plugin plugin)
@@ -71,18 +75,16 @@ namespace cs2_rockthevote
         // otherwise, returns the matching name
         public string GetSingleMatchingMapName(string map, CCSPlayerController player, StringLocalizer _localizer)
         {
-            // Check if the map is already in the list and if it has a cooldown
-            var existingMap = this.Maps.FirstOrDefault(x => x.Name.ToLower() == map.ToLower());
-            if (existingMap != null && existingMap.Id != null) // Assuming Id is used for cooldown
+            // Check if the map is already on cooldown due to being recently played
+            if (_mapCooldown != null && _mapCooldown.IsMapInCooldown(map.ToLower()))
             {
-                player?.PrintToChat(_localizer.LocalizeWithPrefix("nominate.map-on-cooldown", existingMap.Name, existingMap.Id));
+                player?.PrintToChat(_localizer.LocalizeWithPrefix("nominate.map-on-cooldown", map, _mapCooldown.InCoolDown));
                 return ""; // Return empty string to indicate that the map cannot be nominated
             }
 
             // Check for maps containing the provided map name
             var matchingMaps = this.Maps
                 .Where(x => x.Name.ToLower().Contains(map.ToLower()))
-                .Where(x => x.Id == null) // Exclude maps with cooldowns
                 .ToList();
 
             if (matchingMaps.Count == 0)
@@ -123,15 +125,6 @@ namespace cs2_rockthevote
             for (int i = 0; i < Math.Min(NominatedMaps.Count, 6); i++)
             {
                 player?.PrintToChat($"{i + 1}. {NominatedMaps[i].Name}");
-            }
-        }
-
-        // Command handling for !mapnominated
-        public void HandleMapNominatedCommand(CCSPlayerController player, string command)
-        {
-            if (command.StartsWith("!mapnominated"))
-            {
-                PrintNominatedMapsToClient(player);
             }
         }
     }
