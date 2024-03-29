@@ -1,6 +1,10 @@
 using CounterStrikeSharp.API.Modules.Entities;
 using cs2_rockthevote.Core;
 using CounterStrikeSharp.API.Core;
+using System;
+using System.IO;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace cs2_rockthevote
 {
@@ -13,6 +17,9 @@ namespace cs2_rockthevote
 
         private Plugin? _plugin;
 
+        // Store nominated maps
+        private List<Map> NominatedMaps { get; } = new List<Map>();
+
         public MapLister()
         {
 
@@ -22,6 +29,7 @@ namespace cs2_rockthevote
         {
             MapsLoaded = false;
             Maps = null;
+            NominatedMaps.Clear();
         }
 
         void LoadMaps()
@@ -54,7 +62,6 @@ namespace cs2_rockthevote
                 LoadMaps();
         }
 
-
         public void OnLoad(Plugin plugin)
         {
             _plugin = plugin;
@@ -62,29 +69,74 @@ namespace cs2_rockthevote
         }
 
         // returns "" if there's no matching or if there's more than one
-        // otherwise, returns the macting name
+        // otherwise, returns the matching name
         public string GetSingleMatchingMapName(string map, CCSPlayerController player, StringLocalizer _localizer)
         {
-            if (this.Maps!.Select(x => x.Name).FirstOrDefault(x => x.ToLower() == map) is not null)
-                return map;
+            // Check if the map is already in the list and if it has a cooldown
+            var existingMap = this.Maps.FirstOrDefault(x => x.Name.ToLower() == map.ToLower());
+            if (existingMap != null && existingMap.Cooldown > 0)
+            {
+                player?.PrintToChat(_localizer.LocalizeWithPrefix("nominate.map-on-cooldown", existingMap.Name, existingMap.Cooldown));
+                return ""; // Return empty string to indicate that the map cannot be nominated
+            }
 
-            var matchingMaps = this.Maps!
-                .Select(x => x.Name)
-                .Where(x => x.ToLower().Contains(map.ToLower()))
+            // Check for maps containing the provided map name
+            var matchingMaps = this.Maps
+                .Where(x => x.Name.ToLower().Contains(map.ToLower()))
+                .Where(x => x.Cooldown <= 0) // Exclude maps with cooldowns
                 .ToList();
 
             if (matchingMaps.Count == 0)
             {
-                player!.PrintToChat(_localizer.LocalizeWithPrefix("general.invalid-map"));
-                return "";
+                player?.PrintToChat(_localizer.LocalizeWithPrefix("general.invalid-map"));
+                return ""; // Return empty string if no matching maps found
             }
             else if (matchingMaps.Count > 1)
             {
-                player!.PrintToChat(_localizer.LocalizeWithPrefix("nominate.multiple-maps-containing-name"));
-                return "";
+                player?.PrintToChat(_localizer.LocalizeWithPrefix("nominate.multiple-maps-containing-name"));
+                return ""; // Return empty string if multiple matching maps found
             }
-            
-            return matchingMaps[0];
+
+            // Return the name of the single matching map
+            return matchingMaps[0].Name;
+        }
+
+        // Method to nominate a map
+        public void NominateMap(string mapName)
+        {
+            var map = Maps.FirstOrDefault(x => x.Name.ToLower() == mapName.ToLower());
+            if (map != null && !NominatedMaps.Contains(map))
+            {
+                NominatedMaps.Add(map);
+            }
+        }
+
+        // Method to print nominated maps to the client
+        public void PrintNominatedMapsToClient(CCSPlayerController player)
+        {
+            player?.PrintToChat("Nominated Maps:");
+            int count = 0;
+            foreach (var map in NominatedMaps)
+            {
+                if (count >= 6)
+                    break;
+                player?.PrintToChat($"{count + 1}. {map.Name}");
+                count++;
+            }
+        }
+    }
+
+    // Inside your plugin class or wherever you handle client commands
+    public class NominatedMap
+    {
+        private MapLister mapLister; // assuming you have an instance of MapLister
+
+        public void OnClientCommand(CCSPlayerController player, string command)
+        {
+            if (command.StartsWith("!mapnominated"))
+            {
+                mapLister.PrintNominatedMapsToClient(player);
+            }
         }
     }
 }
