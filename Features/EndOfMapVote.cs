@@ -112,5 +112,32 @@ namespace cs2_rockthevote
         {
             _config = config.EndOfMapVote;
         }
+private void OnPlayerVote(Player player, Map map)
+{
+    if (!RockTheVotePlugin.IsVoteInProgress)
+    {
+        return;
+    }
+
+    if (!_nominatedMaps.ContainsKey(map.Id))
+    {
+        _nominatedMaps[map.Id] = new NominatedMap
+        {
+            Name = map.Name,
+            VoteCount = 0
+        };
+    }
+
+    _nominatedMaps[map.Id].VoteCount++;
+    RockTheVotePlugin.SendMessage($"{player.Name} has nominated {map.Name}.");
+}
+
+private class NominatedMap
+{
+    public string Name { get; set; }
+    public int VoteCount { get; set; }
+}
+
+private static readonly Dictionary<string, NominatedMap> _nominatedMaps = new Dictionary<string, NominatedMap>();
     }
 }
