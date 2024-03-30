@@ -46,34 +46,29 @@ namespace cs2_rockthevote
             _voteManager!.OnMapStart(map);
         }
 
-        public void CommandHandler(CCSPlayerController? player)
+        public void CommandHandler(CCSPlayerController player)
         {
-            if (player is null)
-                return;
-
             if (_pluginState.DisableCommands || !_config.Enabled)
             {
                 player.PrintToChat(_localizer.LocalizeWithPrefix("general.validation.disabled"));
                 return;
             }
 
-            if (_gameRules.WarmupRunning)
+            if (!_config.EnabledInWarmup && _gameRules.WarmupRunning)
             {
-                if (!_config.EnabledInWarmup)
-                {
-                    player.PrintToChat(_localizer.LocalizeWithPrefix("general.validation.warmup"));
-                    return;
-                }
-            }
-            else if (_config.MinRounds > 0 && _config.MinRounds > _gameRules.TotalRoundsPlayed)
-            {
-                player!.PrintToChat(_localizer.LocalizeWithPrefix("general.validation.minimum-rounds", _config.MinRounds));
+                player.PrintToChat(_localizer.LocalizeWithPrefix("general.validation.warmup"));
                 return;
             }
 
             if (ServerManager.ValidPlayerCount() < _config!.MinPlayers)
             {
                 player.PrintToChat(_localizer.LocalizeWithPrefix("general.validation.minimum-players", _config!.MinPlayers));
+                return;
+            }
+
+            if (_config.MinRounds > 0 && _config.MinRounds > _gameRules.TotalRoundsPlayed)
+            {
+                player!.PrintToChat(_localizer.LocalizeWithPrefix("general.validation.minimum-rounds", _config.MinRounds));
                 return;
             }
 
@@ -108,9 +103,5 @@ namespace cs2_rockthevote
             _config = config.Rtv;
             _voteManager = new AsyncVoteManager(_config);
         }
-    public static void ClearNominatedMaps()
-    {
-        _nominatedMaps.Clear();
-    }
     }
 }
