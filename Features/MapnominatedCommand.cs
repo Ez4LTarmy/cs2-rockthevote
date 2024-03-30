@@ -1,6 +1,6 @@
 using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
-using CounterStrikeSharp.API.Events;
+using CounterStrikeSharp.Events;
 using System;
 
 namespace cs2_rockthevote.Features
