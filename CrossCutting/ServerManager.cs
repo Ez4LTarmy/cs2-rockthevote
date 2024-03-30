@@ -19,5 +19,7 @@ namespace cs2_rockthevote
         {
             return ValidPlayers(considerBots).Length;
         }
+        public static void RegisterCommands() { // Register your commands here 
+        CommandManager.RegisterCommand<NominationListCommand>(); }
     }
 }
