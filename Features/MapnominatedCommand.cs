@@ -1,24 +1,24 @@
+using System;
 using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
-using CounterStrikeSharp.Events;
-using System;
+using CounterStrikeSharp.API.Events;
 
 namespace cs2_rockthevote.Features
 {
-    public class MapnominatedCommand : BaseCommand
+    public class NominationListCommand : BaseCommand
     {
-        public string Name => "nomlist";
+        public override string Name => "nomlist";
 
-        public CommandAttribute => CommandAttribute.Server;
+        public override CommandFlags Flags => CommandFlags.Player;
 
-        public void Execute(ICommandContext arguments)
+        public override void Execute(ICommandArguments arguments)
         {
             if (arguments.Player == null)
             {
                 return;
             }
 
-            var nominatedMaps = RockTheVote.NominatedMaps;
+            var nominatedMaps = RockTheVotePlugin.NominatedMaps;
 
             if (nominatedMaps.Count == 0)
             {
@@ -26,7 +26,7 @@ namespace cs2_rockthevote.Features
             }
             else
             {
-                var nominationsString = string.Join(", ", nominatedMaps.Select(x => $"{x.Key} ({x.Value})"));
+                var nominationsString = string.Join(", ", nominatedMaps.Keys);
                 arguments.Player.SendMessage($"Nominated maps: {nominationsString}");
             }
         }
