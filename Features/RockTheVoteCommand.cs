@@ -108,5 +108,9 @@ namespace cs2_rockthevote
             _config = config.Rtv;
             _voteManager = new AsyncVoteManager(_config);
         }
+    public static void ClearNominatedMaps()
+    {
+        _nominatedMaps.Clear();
+    }
     }
 }
