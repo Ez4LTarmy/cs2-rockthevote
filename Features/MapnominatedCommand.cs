@@ -11,7 +11,7 @@ namespace cs2_rockthevote.Features
 
         public CommandAttribute => CommandAttribute.Server;
 
-        public void Execute(ICommandArguments arguments)
+        public void Execute(ICommandContext arguments)
         {
             if (arguments.Player == null)
             {
