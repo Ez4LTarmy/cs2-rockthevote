@@ -86,5 +86,9 @@ namespace cs2_rockthevote
             
             return matchingMaps[0];
         }
+    private static void OnMapChanged(Map newMap)
+{
+    RockTheVotePlugin.ClearNominatedMaps();
+}
     }
 }
