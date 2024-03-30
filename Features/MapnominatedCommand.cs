@@ -5,7 +5,7 @@ using System;
 
 namespace cs2_rockthevote.Features
 {
-    public class NominationListCommand : ICommand
+    public class MapnominatedCommand : BaseCommand
     {
         public string Name => "nomlist";
 
