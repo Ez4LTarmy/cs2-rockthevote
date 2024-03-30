@@ -1,11 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Events;
-
+using RockTheVotePlugin.Core;
 namespace RockTheVotePlugin.Features
 {
     public class NominationListCommand : ICommand
