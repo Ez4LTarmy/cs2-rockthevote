@@ -9,7 +9,7 @@ namespace cs2_rockthevote.Features
     {
         public string Name => "nomlist";
 
-        public CommandFlags Flags => CommandFlags.Server;
+        public CommandAttribute => CommandAttribute.Server;
 
         public void Execute(ICommandArguments arguments)
         {
