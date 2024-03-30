@@ -1,6 +1,5 @@
 ﻿using CounterStrikeSharp.API;
-using CounterStrikeSharp.Core;
-using CounterStrikeSharp.API.Modules.Cvars;
+using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Timers;
 using cs2_rockthevote.Core;
 using Timer = CounterStrikeSharp.API.Modules.Timers.Timer;
@@ -16,9 +15,6 @@ namespace cs2_rockthevote
         private EndMapVoteManager _voteManager;
         private EndOfMapConfig _config = new();
         private Timer? _timer;
-        private bool deathMatch => _gameMode?.GetPrimitiveValue<int>() == 2 && _gameType?.GetPrimitiveValue<int>() == 1;
-        private ConVar? _gameType;
-        private ConVar? _gameMode;
 
         public EndOfMapVote(TimeLimitManager timeLimit, MaxRoundsManager maxRounds, PluginState pluginState, GameRules gameRules, EndMapVoteManager voteManager)
         {
@@ -31,14 +27,8 @@ namespace cs2_rockthevote
 
         bool CheckMaxRounds()
         {
-            //Server.PrintToChatAll($"Remaining rounds {_maxRounds.RemainingRounds}, remaining wins: {_maxRounds.RemainingWins}, triggerBefore {_config.TriggerRoundsBeforEnd}");
-            if (_maxRounds.UnlimitedRounds)
-                return false;
-
-            if (_maxRounds.RemainingRounds <= _config.TriggerRoundsBeforEnd)
-                return true;
-
-            return _maxRounds.CanClinch && _maxRounds.RemainingWins <= _config.TriggerRoundsBeforEnd;
+            //Server.PrintToChatAll($"Remaining rounds {_maxRounds.RemainingRounds}, Remaining wins {_maxRounds.RemainingWins}");
+            return !_maxRounds.UnlimitedRounds && (_maxRounds.RemainingRounds <= 2 || _maxRounds.RemainingWins <= _config.TriggerRoundsBeforEnd);
         }
 
 
@@ -65,18 +55,19 @@ namespace cs2_rockthevote
             _timer = null;
         }
 
-
-
         public void OnLoad(Plugin plugin)
         {
-            _gameMode = ConVar.Find("game_mode");
-            _gameType = ConVar.Find("game_type");
-
-            void MaybeStartTimer()
+            plugin.RegisterEventHandler<EventRoundStart>((ev, info) =>
             {
-                KillTimer();
+                if (!_pluginState.DisableCommands && !_gameRules.WarmupRunning && CheckMaxRounds() && _config.Enabled)
+                    StartVote();
+
+                return HookResult.Continue;
+            });
+
+            plugin.RegisterEventHandler<EventRoundAnnounceMatchStart>((ev, info) =>
+            {
                 if (!_timeLimit.UnlimitedTime && _config.Enabled)
-                {
                     _timer = plugin.AddTimer(1.0F, () =>
                     {
                         if (_gameRules is not null && !_gameRules.WarmupRunning && !_pluginState.DisableCommands && _timeLimit.TimeRemaining > 0)
@@ -85,25 +76,6 @@ namespace cs2_rockthevote
                                 StartVote();
                         }
                     }, TimerFlags.REPEAT);
-                }
-            }
-
-            plugin.RegisterEventHandler<EventRoundStart>((ev, info) =>
-            {
-
-                if (!_pluginState.DisableCommands && !_gameRules.WarmupRunning && CheckMaxRounds() && _config.Enabled)
-                    StartVote();
-                else if (deathMatch)
-                {
-                    MaybeStartTimer();
-                }
-
-                return HookResult.Continue;
-            });
-
-            plugin.RegisterEventHandler<EventRoundAnnounceMatchStart>((ev, info) =>
-            {
-                MaybeStartTimer();
                 return HookResult.Continue;
             });
         }
@@ -112,32 +84,5 @@ namespace cs2_rockthevote
         {
             _config = config.EndOfMapVote;
         }
-private void OnPlayerVote(Player player, Map map)
-{
-    if (!RockTheVotePlugin.IsVoteInProgress)
-    {
-        return;
-    }
-
-    if (!_nominatedMaps.ContainsKey(map.Id))
-    {
-        _nominatedMaps[map.Id] = new NominatedMap
-        {
-            Name = map.Name,
-            VoteCount = 0
-        };
-    }
-
-    _nominatedMaps[map.Id].VoteCount++;
-    RockTheVotePlugin.SendMessage($"{player.Name} has nominated {map.Name}.");
-}
-
-private class NominatedMap
-{
-    public string Name { get; set; }
-    public int VoteCount { get; set; }
-}
-
-private static readonly Dictionary<string, NominatedMap> _nominatedMaps = new Dictionary<string, NominatedMap>();
     }
 }
