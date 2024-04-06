@@ -1,4 +1,6 @@
-﻿namespace cs2_rockthevote
+﻿using cs2_rockthevote.Contracts;
+
+namespace cs2_rockthevote
 {
     public class PluginState : IPluginDependency<Plugin, Config>
     {

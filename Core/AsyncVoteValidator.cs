@@ -1,4 +1,6 @@
-﻿namespace cs2_rockthevote
+﻿using cs2_rockthevote.CrossCutting;
+
+namespace cs2_rockthevote.Core
 {
     public class AsyncVoteValidator
     {

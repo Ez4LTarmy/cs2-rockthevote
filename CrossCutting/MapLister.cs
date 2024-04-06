@@ -1,8 +1,8 @@
-﻿using CounterStrikeSharp.API.Modules.Entities;
+﻿using CounterStrikeSharp.API.Core;
+using cs2_rockthevote.Contracts;
 using cs2_rockthevote.Core;
-using CounterStrikeSharp.API.Core;
 
-namespace cs2_rockthevote
+namespace cs2_rockthevote.CrossCutting
 {
     public class MapLister : IPluginDependency<Plugin, Config>
     {
@@ -65,10 +65,10 @@ namespace cs2_rockthevote
         // otherwise, returns the macting name
         public string GetSingleMatchingMapName(string map, CCSPlayerController player, StringLocalizer _localizer)
         {
-            if (this.Maps!.Select(x => x.Name).FirstOrDefault(x => x.ToLower() == map) is not null)
+            if (Maps!.Select(x => x.Name).FirstOrDefault(x => x.ToLower() == map) is not null)
                 return map;
 
-            var matchingMaps = this.Maps!
+            var matchingMaps = Maps!
                 .Select(x => x.Name)
                 .Where(x => x.ToLower().Contains(map.ToLower()))
                 .ToList();
@@ -83,7 +83,7 @@ namespace cs2_rockthevote
                 player!.PrintToChat(_localizer.LocalizeWithPrefix("nominate.multiple-maps-containing-name"));
                 return "";
             }
-            
+
             return matchingMaps[0];
         }
     }

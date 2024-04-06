@@ -1,7 +1,7 @@
 ﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 
-namespace cs2_rockthevote
+namespace cs2_rockthevote.CrossCutting
 {
     public static class ServerManager
     {

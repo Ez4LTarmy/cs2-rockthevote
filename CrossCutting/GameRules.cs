@@ -1,9 +1,9 @@
 ﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
-using CounterStrikeSharp.API.Core.Attributes.Registration;
+using cs2_rockthevote.Contracts;
 using Timer = CounterStrikeSharp.API.Modules.Timers.Timer;
 
-namespace cs2_rockthevote
+namespace cs2_rockthevote.CrossCutting
 {
     public class GameRules : IPluginDependency<Plugin, Config>
     {

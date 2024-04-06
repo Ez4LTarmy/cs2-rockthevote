@@ -1,10 +1,11 @@
 ﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Core.Attributes.Registration;
-using CounterStrikeSharp.API.Core.Logging;
 using CounterStrikeSharp.API.Modules.Commands;
 using CounterStrikeSharp.API.Modules.Menu;
+using cs2_rockthevote.Contracts;
 using cs2_rockthevote.Core;
+using cs2_rockthevote.CrossCutting;
 using Microsoft.Extensions.Localization;
 
 namespace cs2_rockthevote

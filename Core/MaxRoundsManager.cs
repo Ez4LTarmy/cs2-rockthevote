@@ -1,10 +1,10 @@
-﻿using CounterStrikeSharp.API;
-using CounterStrikeSharp.API.Core;
+﻿using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Cvars;
 using CounterStrikeSharp.API.Modules.Utils;
-using System.Security.Cryptography.X509Certificates;
+using cs2_rockthevote.Contracts;
+using cs2_rockthevote.CrossCutting;
 
-namespace cs2_rockthevote
+namespace cs2_rockthevote.Core
 {
     public class MaxRoundsManager : IPluginDependency<Plugin, Config>
     {
@@ -49,7 +49,7 @@ namespace cs2_rockthevote
                 if (!CanClinch)
                     return MaxRoundsValue;
 
-                return ((int)Math.Floor(MaxRoundsValue / 2M)) + 1;
+                return (int)Math.Floor(MaxRoundsValue / 2M) + 1;
             }
         }
 

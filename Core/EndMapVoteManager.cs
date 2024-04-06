@@ -2,13 +2,14 @@
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Menu;
 using CounterStrikeSharp.API.Modules.Timers;
-using cs2_rockthevote.Core;
+using cs2_rockthevote.Contracts;
+using cs2_rockthevote.CrossCutting;
 using System.Data;
 using System.Text;
 using static CounterStrikeSharp.API.Core.Listeners;
 using Timer = CounterStrikeSharp.API.Modules.Timers.Timer;
 
-namespace cs2_rockthevote
+namespace cs2_rockthevote.Core
 {
     //public partial class Plugin
     //{

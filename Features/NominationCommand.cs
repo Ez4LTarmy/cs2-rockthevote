@@ -4,7 +4,9 @@ using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Core.Attributes.Registration;
 using CounterStrikeSharp.API.Modules.Commands;
 using CounterStrikeSharp.API.Modules.Menu;
+using cs2_rockthevote.Contracts;
 using cs2_rockthevote.Core;
+using cs2_rockthevote.CrossCutting;
 
 namespace cs2_rockthevote
 {
@@ -37,6 +39,7 @@ namespace cs2_rockthevote
         private MapCooldown _mapCooldown;
         private MapLister _mapLister;
 
+        public Dictionary<int, List<string>> Nomlist => Nominations;
         public NominationCommand(MapLister mapLister, GameRules gamerules, StringLocalizer localizer, PluginState pluginState, MapCooldown mapCooldown)
         {
             _mapLister = mapLister;

@@ -1,4 +1,4 @@
-﻿namespace cs2_rockthevote
+﻿namespace cs2_rockthevote.Core
 {
     public enum VoteResultEnum
     {

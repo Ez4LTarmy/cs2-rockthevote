@@ -3,6 +3,9 @@ using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Core.Attributes.Registration;
 using CounterStrikeSharp.API.Modules.Commands;
+using cs2_rockthevote.Contracts;
+using cs2_rockthevote.Core;
+using cs2_rockthevote.CrossCutting;
 
 namespace cs2_rockthevote
 {

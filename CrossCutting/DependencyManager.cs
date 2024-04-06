@@ -1,7 +1,8 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using cs2_rockthevote.Contracts;
+using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
-namespace cs2_rockthevote
+namespace cs2_rockthevote.CrossCutting
 {
     public class DependencyManager<TPlugin, TConfig>
     {

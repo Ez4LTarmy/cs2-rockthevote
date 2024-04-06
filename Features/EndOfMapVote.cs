@@ -1,10 +1,11 @@
-﻿using CounterStrikeSharp.API;
-using CounterStrikeSharp.API.Core;
+﻿using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Timers;
+using cs2_rockthevote.Contracts;
 using cs2_rockthevote.Core;
+using cs2_rockthevote.CrossCutting;
 using Timer = CounterStrikeSharp.API.Modules.Timers.Timer;
 
-namespace cs2_rockthevote
+namespace cs2_rockthevote.Features
 {
     public class EndOfMapVote : IPluginDependency<Plugin, Config>
     {

@@ -1,4 +1,6 @@
 ﻿using CounterStrikeSharp.API;
+using cs2_rockthevote.Contracts;
+using cs2_rockthevote.CrossCutting;
 
 namespace cs2_rockthevote.Core
 {
@@ -15,7 +17,7 @@ namespace cs2_rockthevote.Core
             mapLister.EventMapsLoaded += (e, maps) =>
             {
                 var map = Server.MapName;
-                if(map is not null)
+                if (map is not null)
                 {
                     if (InCoolDown == 0)
                     {
