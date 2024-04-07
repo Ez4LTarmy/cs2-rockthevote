@@ -9,10 +9,19 @@ public partial class Plugin
     [ConsoleCommand("nomlist", "Show nomlist")]
     public void OnNomlist(CCSPlayerController? player, CommandInfo command)
     {
-        var test = _nominationManager.Nomlist
+        var Nomlist = _nominationManager.Nomlist
             .Values
             .SelectMany(list => list)
-            .Distinct();
+            .Distinct()
+            .Select((map, index) => $"{index + 1}. {map}");
 
+        player.PrintToChat("==> Nomlist will display on console <==");
+
+        string Maplist = string.Join(System.Environment.NewLine, Nomlist);
+
+        player.PrintToConsole("**** LIST OF MAPS NOMINATED ***");
+        player.PrintToConsole(Maplist);
+        player.PrintToConsole("*********************************");
     }
+
 }
