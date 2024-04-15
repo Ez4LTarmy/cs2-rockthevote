@@ -16,7 +16,7 @@ public partial class Plugin
             .Values
             .SelectMany(list => list)
             .Distinct()
-            .Select((map, index) => $"{index + 1}. {map}");
+            .Select((map, index) => $"{index + 1}. {map} by {player.PlayerName}");
 
         string Maplist = string.Join(NewLine.ToString(), Nomlist);
 
