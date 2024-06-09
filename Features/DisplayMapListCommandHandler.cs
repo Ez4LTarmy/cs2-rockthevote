@@ -28,12 +28,12 @@ public class DisplayMapListCommandHandler : IPluginDependency<Plugin, Config>
 
             if (!int.TryParse(part, out var partNumber))
             {
-                player?.PrintToChat("You need to provide the number which part you want to display (0 by def)");
+                player?.PrintToChat("You provided wrong argument, was executed with 0 by default.");
             }
 
             if (partNumber < 0)
             {
-                player?.PrintToConsole("Invalid part number.");
+                player?.PrintToChat("Invalid part number. Please provide number greater then 0.");
                 return;
             }
 
