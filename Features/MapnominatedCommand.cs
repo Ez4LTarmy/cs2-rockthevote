@@ -16,7 +16,7 @@ public partial class Plugin
             .Values
             .SelectMany(list => list)
             .Distinct()
-            .Select((map, index) => $"{index + 1}. {map} by {player.PlayerName}");
+            .Select((map, index) => $"{index + 1}. {map}");
 
         string Maplist = string.Join(NewLine.ToString(), Nomlist);
 
@@ -24,5 +24,6 @@ public partial class Plugin
         player.PrintToChat(Maplist);
         player.PrintToChat("********************************");
     }
+
 
 }
