@@ -28,12 +28,14 @@ public class DisplayMapListCommandHandler : IPluginDependency<Plugin, Config>
 
             if (!int.TryParse(part, out var partNumber))
             {
-                player?.PrintToConsole("You need to provide the number which part you want to display.");
+                player?.PrintToChat("You need to provide the number which part you want to display (0 by def)");
+                player?.PrintToChat($"debug: {partNumber}");
             }
 
             if (partNumber < 0)
             {
                 player?.PrintToConsole("Invalid part number.");
+                return;
             }
 
             _maps.Skip(_mapsPerPage * partNumber).Take(_mapsPerPage).ToList().ForEach(map =>
