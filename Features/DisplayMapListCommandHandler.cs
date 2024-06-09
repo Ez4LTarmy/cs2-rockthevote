@@ -24,12 +24,11 @@ public class DisplayMapListCommandHandler : IPluginDependency<Plugin, Config>
 
         plugin.AddCommand("maplist", "Displays maplist into console", (player, info) =>
         {
-            var part = info.GetArg(0); // current part to display
+            var part = info.GetArg(1); // current part to display
 
             if (!int.TryParse(part, out var partNumber))
             {
                 player?.PrintToChat("You need to provide the number which part you want to display (0 by def)");
-                player?.PrintToChat($"debug: {partNumber}");
             }
 
             if (partNumber < 0)
